@@ -87,4 +87,48 @@ router.put("/", async (req, res, next) => {
     res.send(result);
 });
 
+// 채용 공고 목록 가져오는 api
+router.get("/list", async (req, res, next) => {
+    const result = {
+        message: "",
+        data: {}
+    };
+    const page = req.query.page || 1;
+    const offset = (page - 1) * RECRUIT_NOTICE.MAX_NOTICES_PER_PAGE;
+
+    try {
+        validator(page, "page").isNumber().isPositive();
+
+        const selectNoticeAllSql = `SELECT
+                                        recruit_notice_tb.id,
+                                        recruit_notice_tb.company_id AS "companyId",
+                                        company_tb.name AS "companyName",
+                                        company_tb.name AS "country",
+                                        company_tb.region AS "region",
+                                        recruit_notice_tb.position,
+                                        recruit_notice_tb.reward,
+                                        recruit_notice_tb.skills
+                                    FROM
+                                        recruit_notice_tb
+                                    JOIN
+                                        company_tb
+                                    ON
+                                        recruit_notice_tb.company_id = company_tb.id
+                                    ORDER BY
+                                        recruit_notice_tb.created_at DESC
+                                    OFFSET
+                                        $1
+                                    LIMIT
+                                        $2`;
+        const selectNoticeAllParam = [offset, RECRUIT_NOTICE.MAX_NOTICES_PER_PAGE];
+        const selectNoticeAllResult = await pool.query(selectNoticeAllSql, selectNoticeAllParam);
+        result.data = {
+            notices: selectNoticeAllResult.rows
+        }
+    } catch (error) {
+        return next(error);
+    }
+    res.send(result);
+});
+
 module.exports = router;
