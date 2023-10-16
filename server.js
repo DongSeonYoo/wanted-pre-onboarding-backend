@@ -1,8 +1,9 @@
 require("dotenv").config();
 const express = require('express');
 const app = express();
+const cookieParser = require("cookie-parser");
+const errorHandling = require("./middleware/errorHandling");
 const recruitNoticeApi = require("./routes/recruit-notice");
-
 
 // global middleware
 app.use(express.json());
