@@ -151,4 +151,56 @@ router.get("/list", async (req, res, next) => {
     res.send(result);
 });
 
+// 채용 공고 상세 페이지 api
+router.get("/:noticeId", async (req, res, next) => {
+    const { noticeId } = req.params;
+    const result = {
+        message: "",
+        data: {}
+    };
+
+    try {
+        validator(noticeId, "noticeId").checkInput().isNumber();
+
+        const selectNoticeSql = `SELECT
+                                        recruit_notice_tb.id,
+                                        company_tb.name AS "companyName",
+                                        company_tb.country,
+                                        company_tb.region,
+                                        recruit_notice_tb.position,
+                                        recruit_notice_tb.reward,
+                                        recruit_notice_tb.skills,
+                                        recruit_notice_tb.content,
+                                        ARRAY (
+                                            SELECT
+                                                recruit_notice_tb.id
+                                            FROM
+                                                recruit_notice_tb
+                                            WHERE
+                                                recruit_notice_tb.company_id = company_tb.id
+                                            ORDER BY
+                                                recruit_notice_tb.created_at DESC
+                                            LIMIT
+                                                $2
+                                        ) AS "otherNotices"
+                                    FROM
+                                        recruit_notice_tb
+                                    JOIN
+                                        company_tb
+                                    ON
+                                        recruit_notice_tb.company_id = company_tb.id
+                                    WHERE
+                                        recruit_notice_tb.id = $1`;
+        const selectNoticeParam = [noticeId, RECRUIT_NOTICE.MAX_OTHER_NOTICE_PER_PAGE];
+        const selectNoticeResult = await pool.query(selectNoticeSql, selectNoticeParam);
+
+        result.data = {
+            notices: selectNoticeResult.rows[0]
+        }
+    } catch (error) {
+        return next(error);
+    }
+    res.send(result);
+});
+
 module.exports = router;
