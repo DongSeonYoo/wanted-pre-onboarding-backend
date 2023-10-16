@@ -87,24 +87,26 @@ router.put("/", async (req, res, next) => {
     res.send(result);
 });
 
-// 채용 공고 목록 가져오는 api
+// 채용 공고 목록 가져오는 api + 검색 (company_name, position, skills) 기준
+// 기본 페이지는 1, 한 페이지 당 10개의 게시글을 가져옴.
 router.get("/list", async (req, res, next) => {
     const result = {
         message: "",
         data: {}
     };
+    const search = req.query.search || "";
     const page = req.query.page || 1;
     const offset = (page - 1) * RECRUIT_NOTICE.MAX_NOTICES_PER_PAGE;
 
     try {
         validator(page, "page").isNumber().isPositive();
 
-        const selectNoticeAllSql = `SELECT
+        let selectNoticeAllSql = `SELECT
                                         recruit_notice_tb.id,
                                         recruit_notice_tb.company_id AS "companyId",
                                         company_tb.name AS "companyName",
-                                        company_tb.name AS "country",
-                                        company_tb.region AS "region",
+                                        company_tb.country,
+                                        company_tb.region,
                                         recruit_notice_tb.position,
                                         recruit_notice_tb.reward,
                                         recruit_notice_tb.skills
@@ -113,14 +115,32 @@ router.get("/list", async (req, res, next) => {
                                     JOIN
                                         company_tb
                                     ON
-                                        recruit_notice_tb.company_id = company_tb.id
-                                    ORDER BY
-                                        recruit_notice_tb.created_at DESC
-                                    OFFSET
-                                        $1
-                                    LIMIT
-                                        $2`;
+                                        recruit_notice_tb.company_id = company_tb.id 
+                                    `;
         const selectNoticeAllParam = [offset, RECRUIT_NOTICE.MAX_NOTICES_PER_PAGE];
+        // 검색어가 비어 있지 않으면 SQL에 검색어 조건을 추가
+        if (search !== "") {
+            selectNoticeAllSql += ` WHERE 
+                                        recruit_notice_tb.position 
+                                    LIKE 
+                                        $3
+                                    OR
+                                        recruit_notice_tb.skills 
+                                    LIKE 
+                                        $3
+                                    OR
+                                        company_tb.name
+                                    LIKE 
+                                        $3 `;
+            selectNoticeAllParam.push(`%${search}%`);
+        }
+        selectNoticeAllSql += `ORDER BY
+                                    recruit_notice_tb.created_at DESC
+                                OFFSET
+                                    $1
+                                LIMIT
+                                    $2`;
+
         const selectNoticeAllResult = await pool.query(selectNoticeAllSql, selectNoticeAllParam);
         result.data = {
             notices: selectNoticeAllResult.rows
