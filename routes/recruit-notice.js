@@ -41,8 +41,8 @@ router.post("/", async (req, res, next) => {
         };
 
     } catch (error) {
-        if (error.constriant === CONSTRAINT.FK_COMPANY_TO_RECRUIT_TB) {
-            throw new BadRequestException("해당하는 회사가 존재하지 않습니다.");
+        if (error.constraint === CONSTRAINT.FK_COMPANY_TO_RECRUIT_TB) {
+            return next(new BadRequestException("해당하는 회사가 존재하지 않습니다"));
         }
         return next(error);
     }
@@ -268,7 +268,9 @@ router.get("/:noticeId/apply-list", async (req, res, next) => {
                                     ON
                                         apply_tb.recruit_notice_id = recruit_notice_tb.id
                                     WHERE
-                                        apply_tb.recruit_notice_id = $1`;
+                                        apply_tb.recruit_notice_id = $1
+                                    ORDER BY
+                                        apply_tb.created_at`;
         const selectApplyListParam = [noticeId];
         const selectApplyResult = await pool.query(selectApplyListSql, selectApplyListParam);
         if (selectApplyResult.rowCount === 0) {
