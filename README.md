@@ -68,7 +68,7 @@
 
 
 # 특이사항
-## **1. [validatoe](./modules/validator.js) 라는 데이터 검증 함수를 직접 만들어 api 내부에서 method chaining 방식으로 데이터를 검증해줍니다.**<br>
+## **1. [validate](./modules/validator.js) 라는 데이터 검증 함수를 직접 만들어 api 내부에서 method chaining 방식으로 데이터를 검증해줍니다.**<br>
 ### Example
 ```javascript
     validator(noticeId, "noticeId").checkInput().isNumber();
