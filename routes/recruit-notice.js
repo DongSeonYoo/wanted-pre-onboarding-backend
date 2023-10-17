@@ -231,4 +231,56 @@ router.get("/:noticeId", async (req, res, next) => {
     res.send(result);
 });
 
+// 지원 내역을 확인하는 api
+// 권한: 회사 관리자
+router.get("/:noticeId/apply-list", async (req, res, next) => {
+    const { noticeId } = req.params;
+    const page = req.query.page || 1;
+    const result = {
+        message: "",
+        data: {}
+    };
+
+    try {
+        validator(noticeId, "noticeId").checkInput().isNumber();
+        validator(page, "page").isNumber().isPositive();
+
+        const selectApplyListSql = `SELECT
+                                        user_tb.id,
+                                        user_tb.name,
+                                        user_tb.email,
+                                        CONCAT
+                                        (SUBSTRING
+                                            (
+                                                recruit_notice_tb.content, 1, 20
+                                            ), '...') AS "noticeContent",
+                                        recruit_notice_tb.position,
+                                        recruit_notice_tb.skills,
+                                        TO_CHAR(recruit_notice_tb.created_at, 'YYYY.MM.DD') AS "createdAt"
+                                    FROM
+                                        apply_tb
+                                    JOIN
+                                    user_tb
+                                    ON
+                                        apply_tb.account_id = user_tb.id
+                                    JOIN
+                                        recruit_notice_tb
+                                    ON
+                                        apply_tb.recruit_notice_id = recruit_notice_tb.id
+                                    WHERE
+                                        apply_tb.recruit_notice_id = $1`;
+        const selectApplyListParam = [noticeId];
+        const selectApplyResult = await pool.query(selectApplyListSql, selectApplyListParam);
+        if (selectApplyResult.rowCount === 0) {
+            result.message = "해당 공고에 지원자가 없습니다 ㅠㅠ";
+        }
+        result.data = {
+            user: selectApplyResult.rows
+        };
+    } catch (error) {
+        return next(error);
+    }
+    res.send(result);
+});
+
 module.exports = router;
