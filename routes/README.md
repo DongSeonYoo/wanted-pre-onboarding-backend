@@ -41,7 +41,7 @@
 status code: 401
 ```json
 {
-    "message": "companyId: 정수가 아닙니다"
+    "message": "로그인 후 이용 가능합니다"
 }
 ```
 <br>
