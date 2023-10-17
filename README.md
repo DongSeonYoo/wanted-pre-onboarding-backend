@@ -20,7 +20,8 @@
     "nodemon": "^3.0.1", (개발용)
     "pg": "^8.11.3" (postgresql과 express를 연결해주는 목적)
 
+[api명세서](./routes/README.md)
+
 # ERD 설계
 - **tool: ERD editor (Visual Studio Code)**
 ![screensh](./image/ERD.png)
-
