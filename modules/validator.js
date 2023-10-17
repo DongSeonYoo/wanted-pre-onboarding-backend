@@ -34,6 +34,11 @@ function Validation(input, name) {
         return this;
     }
 
+    this.checkRegex = (regex) => {
+        if (!regex.test(input)) this.setError(errorMessage.regex);
+        return this;
+    }
+
     this.setError = (message) => {
         const error = new BadRequestException(`${name}: ${message}`);
         throw error;
