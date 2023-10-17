@@ -1,5 +1,7 @@
 # wanted-pre-onboarding-backend
 
+# [api명세서는 이곳에!!](./routes/README.md)
+
 # 요구사항 분석
     - 회사는 채용 공고를 등록하고 관리할 수 있음 (수정, 삭제).
     - 사용자는 회사가 올린 채용 공고를 확인할 수 있음.
@@ -19,8 +21,6 @@
     "jsonwebtoken": "^9.0.2", (로그인 유지 목적)
     "nodemon": "^3.0.1", (개발용)
     "pg": "^8.11.3" (postgresql과 express를 연결해주는 목적)
-
-[api명세서](./routes/README.md)
 
 # ERD 설계
 - **tool: ERD editor (Visual Studio Code)**
