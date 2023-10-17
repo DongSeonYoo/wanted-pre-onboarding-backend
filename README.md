@@ -57,11 +57,11 @@
     "pg": "^8.11.3" (postgresql과 express를 연결해주는 목적)
 
 ### Commit convention
-<img src="./commit convention.png" width="800" height="600"/>
+<img src="./images/commit convention.png" width="800" height="600"/>
 
 # ERD 설계
 - **tool: ERD editor (Visual Studio Code)**
-<img src="./ERD.png" width="1200" height="800"/>
+<img src="./images/ERD.png" width="1600" height="800"/>
 
 
 # 특이사항
@@ -101,7 +101,9 @@
             secure: false,
     });
 ```
-![screensh](/jwt.png)
+
+<img src="./images/jwt.png" width="1100" height="300"/><br>
+
 ### api에 아래처럼 loginAuthCheck 미들웨어를 장착해주면 토큰 검증을 해주고 해당 api에 req.decoded에 로그인 한 유저의 pk를 가져올 수 있습니다.
 ```javascript
 router.post("/recruit-notice", loginAuthCheck, async (req, res, next) => {
