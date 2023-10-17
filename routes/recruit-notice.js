@@ -87,6 +87,34 @@ router.put("/", async (req, res, next) => {
     res.send(result);
 });
 
+// 채용 공고 삭제 api
+router.delete("/", async (req, res, next) => {
+    const { noticeId } = req.body;
+    const result = {
+        message: "",
+        data: {}
+    };
+
+    try {
+        validator(noticeId, "noticeId").checkInput().isNumber();
+
+        const deleteNoticeSql = `DELETE FROM
+                                        recruit_notice_tb
+                                    WHERE
+                                        id = $1`;
+        const deleteNoticeParam = [noticeId];
+        const deleteNoticeResult = await pool.query(deleteNoticeSql, deleteNoticeParam);
+        if (deleteNoticeResult.rowCount === 0) {
+            throw new BadRequestException("해당하는 채용 공고가 존재하지 않습니다");
+        }
+        result.message = "삭제 완료";
+
+    } catch (error) {
+        return next(error);
+    }
+    res.send(result);
+});
+
 // 채용 공고 목록 가져오는 api + 검색 (company_name, position, skills) 기준
 // 기본 페이지는 1, 한 페이지 당 10개의 게시글을 가져옴.
 router.get("/list", async (req, res, next) => {
