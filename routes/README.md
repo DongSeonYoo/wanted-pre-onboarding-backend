@@ -1,4 +1,55 @@
 # api 명세
+
+## 먼저, api 실패시 status code를 명세합니다
+### 현재 사용중인 status code는 
+    1. 400 BadRequestException
+    2. 401 UnauthorizedException
+    3. 500 InternerServerException
+    총 3개의 status code 사용중
+
+# 400 status code 응답 예시
+- 프론트엔드에서 잘못된 요청 값을 보내줬을 때 발생합니다
+- API의 query string, path variable, body 같은 request의 값이 유효하지 않은 값으로 들어왔을 때 발생합니다 <br>
+### Request
+```json
+{
+    "companyId": "a", //정수를 보내지 않았을 경우
+    "position": "백엔드 주니어 개발자",
+    "reward": 1000000,
+    "content": "원티드랩에서 백엔드 주니어 개발자를 '적극' 채용합니다. 자격요건은..",
+    "skills": "Node.js"
+}
+```
+### Response
+```json
+{
+    "message": "companyId: 정수가 아닙니다"
+}
+```
+
+# 401 status code 응답 예시
+1. 로그인하지 않은 유저가 로그인이 필요한 api를 호출하였을 경우.
+2. 토큰이 조작되었을 경우도 해당 에러가 발생합니다<br>
+
+### Request
+```json
+{
+    "noticeId": 2 // 채용 공고에 지원 시 로그인이 필요한데 로그인 하지 않고 api를 호출한경우
+}
+```
+### Response
+status code: 401
+```json
+{
+    "message": "companyId: 정수가 아닙니다"
+}
+```
+<br>
+
+# 500 status code는 위 명세된것 이외의 상황에 (서버 오류)발생합니다, <br> 아래부턴 작성된 api입니다.
+<br>
+
+
 ## 채용 공고를 등록하는 api<br>
 ### ENDPOINT: POST /recruit-notice
 
@@ -25,7 +76,6 @@
     }
 }
 ```
-
 
 ## 채용 공고를 수정하는 api<br>
 ### ENDPOINT: PUT /recruit-notice
