@@ -17,6 +17,21 @@ router.post("/recruit-notice", loginAuthCheck, async (req, res, next) => {
     try {
         validator(noticeId, "noticeId").checkInput().isNumber();
 
+        // 이미 지원한 공고인지 확인
+        const selectExistApplySql = `SELECT
+                                            apply_tb.id
+                                        FROM
+                                            apply_tb
+                                        WHERE
+                                            apply_tb.account_id = $1
+                                        AND
+                                            apply_tb.recruit_notice_id = $2`;
+        const selectExistApplyParam = [userId, noticeId];
+        const selectExistApplyResult = await pool.query(selectExistApplySql, selectExistApplyParam);
+        if (selectExistApplyResult.rowCount !== 0) {
+            throw new BadRequestException("이미 해당 공고에 지원하였습니다")
+        }
+        // 지원 내역이 없으면 해당 공고에 지원
         const insertApplySql = `INSERT INTO
                                         apply_tb (recruit_notice_id, account_id)
                                     VALUES
