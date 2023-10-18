@@ -245,6 +245,15 @@ status code: 401
     }
 }
 ```
+## 만약 기존에 지원한 내역이 있다면 400 error
+# **[여기서 잡아줍니다](./apply.js)**
+### Response
+```json
+status code: 400
+{
+    "message": "이미 해당 공고에 지원하였습니다",
+}
+```
 
 
 # 그 외 추가적인 api
